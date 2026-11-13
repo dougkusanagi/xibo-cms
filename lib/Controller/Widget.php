@@ -714,7 +714,11 @@ class Widget extends Base
             'widget' => $widget,
             'module' => $this->moduleFactory->getByType($widget->type),
             'transitions' => [
-                'in' => $this->transitionFactory->getEnabledByType('in'),
+                'in' => array_values(array_filter(
+                    $this->transitionFactory->getEnabledByType('in'),
+                    fn ($transition) => $transition->code !== \Xibo\Helper\LightLeakTransition::CODE
+                        || $widget->type === 'image'
+                )),
                 'out' => $this->transitionFactory->getEnabledByType('out'),
                 'compassPoints' => array(
                     array('id' => 'N', 'name' => __('North')),
@@ -762,7 +766,7 @@ class Widget extends Base
                 properties: [
                     new OA\Property(
                         property: 'transitionType',
-                        description: 'Type of a transition, available Options: fly, fadeIn, fadeOut',
+                        description: 'Type of a transition: fly, fadeIn, fadeOut, lightLeak (photo entry only)',
                         type: 'string',
                     ),
                     new OA\Property(
@@ -824,10 +828,15 @@ class Widget extends Base
         $widget->load();
         $sanitizedParams = $this->getSanitizer($request->getParams());
 
+        $transitionDuration = $sanitizedParams->getInt('transitionDuration');
+        if ($sanitizedParams->getString('transitionType') === \Xibo\Helper\LightLeakTransition::CODE) {
+            $transitionDuration = \Xibo\Helper\LightLeakTransition::validate($widget->type, $type, $transitionDuration);
+        }
+
         switch ($type) {
             case 'in':
                 $widget->setOptionValue('transIn', 'attrib', $sanitizedParams->getString('transitionType'));
-                $widget->setOptionValue('transInDuration', 'attrib', $sanitizedParams->getInt('transitionDuration'));
+                $widget->setOptionValue('transInDuration', 'attrib', $transitionDuration);
                 $widget->setOptionValue(
                     'transInDirection',
                     'attrib',

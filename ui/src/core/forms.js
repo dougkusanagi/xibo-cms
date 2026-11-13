@@ -5235,3 +5235,12 @@ window.forms = {
     });
   },
 };
+
+// Light Leak is available for photo entry transitions. Initialise its duration
+// when selected without overwriting an existing administrator/user value.
+$(document).on('change', '#moduleTransitionEditForm #transitionType', function() {
+  const form = $(this).closest('form');
+  if ($(this).val() === 'lightLeak' && !form.find('#transitionDuration').val()) {
+    form.find('#transitionDuration').val(1800).trigger('change');
+  }
+});

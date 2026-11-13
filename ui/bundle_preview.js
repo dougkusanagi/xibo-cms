@@ -24,5 +24,7 @@ window.jQuery = window.$ = require('jquery');
 // XLR
 import '@xibosignage/xibo-layout-renderer/dist/styles.css';
 
-import XiboLayoutRenderer from '@xibosignage/xibo-layout-renderer';
+import XiboLayoutRenderer, {Region, Media} from '@xibosignage/xibo-layout-renderer';
+import {installLightLeakTransitions} from './src/transitions/lightLeak.mjs';
+installLightLeakTransitions({Region, Media});
 window.XiboLayoutRenderer = XiboLayoutRenderer;

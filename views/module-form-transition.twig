@@ -78,6 +78,9 @@
                     {% set transitionsWithEmpty = [{code: "", transition: ""}]|merge(transitions.in) %}
                     {% set trans = widget.getOptionValue("transIn", null) %}
                     {% set transDuration = widget.getOptionValue("transInDuration", null) %}
+                    {% if trans == 'lightLeak' and transDuration is null %}
+                        {% set transDuration = 1800 %}
+                    {% endif %}
                     {% set transDirection = widget.getOptionValue("transInDirection", null) %}
                     {% set helpText %}{% trans "What transition should be applied when this item starts?" %}{% endset %}
                 {% elseif type == "out" %}
@@ -93,6 +96,10 @@
 
                 {% set title %}{% trans "Transition" %}{% endset %}
                 {{ forms.dropdown("transitionType", "single", title, trans, transitionsWithEmpty, "code", "transition", helpText) }}
+                {% if type == 'in' and widget.type == 'image' %}
+                    {% set message %}{% trans "Light Leak reveals the next photo with a warm glow. Use with the compatible macOS player. Suggested duration: 1800 ms." %}{% endset %}
+                    {{ forms.message(message) }}
+                {% endif %}
 
                 {% set title %}{% trans "Duration" %}{% endset %}
                 {% set helpText %}{% trans "The duration for this transition, in milliseconds." %}{% endset %}
